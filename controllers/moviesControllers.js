@@ -1,64 +1,43 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+const Movie = require('../models/movie');
+const ErrorCode = require('../errors/errorCode');
+const NotFoundCode = require('../errors/notFoundCode');
+const ServerCode = require('../errors/serverCode');
+const ForbiddenError = require('../errors/forbiddenError');
 
-const urlValidator = {
-  validator: (v) => validator.isURL(v, { protocols: ['http', 'https'], require_protocol: true }),
-  message: ({ value }) => `${value} - некоректный адрес URL. Ожидается адрес в формате: http(s)://(www).site.com`,
+module.exports.getMovie = (req, res, next) => {
+  Movie.find({ owner: req.user._id }).then((movies) => res.send(movies))
+    .catch(next);
 };
 
-const movieSchema = new mongoose.Schema({
-  country: {
-    require: true,
-    type: String,
-  },
-  director: {
-    require: true,
-    type: String,
-  },
-  duration: {
-    require: true,
-    type: Number,
-  },
-  year: {
-    require: true,
-    type: String,
-  },
-  description: {
-    require: true,
-    type: String,
-  },
-  image: {
-    require: true,
-    type: String,
-    validate: urlValidator,
-  },
-  trailerLink: {
-    require: true,
-    type: String,
-    validate: urlValidator,
-  },
-  thumbnail: {
-    require: true,
-    type: String,
-    validate: urlValidator,
-  },
-  owner: {
-    require: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'user',
-  },
-  movieId: {
-    require: true,
-    type: Number,
-  },
-  nameRU: {
-    require: true,
-    type: String,
-  },
-  nameEN: {
-    require: true,
-    type: String,
-  },
-});
+module.exports.createMovie = (req, res, next) => {
+  Movie.findOne({ movieId: req.body.movieId, owner: req.user._id })
+    .then((movie) => res.send(movie))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ErrorCode('Ошибка валидации'));
+      } else {
+        next(new ServerCode('Ошибка на сервере'));
+      }
+    });
+};
 
-module.exports = mongoose.model('movie', movieSchema);
+module.exports.removeMovie = (req, res, next) => {
+  Movie.findById(req.params.movieId)
+    .then((movie) => {
+      if (!movie) {
+        throw new NotFoundCode('Карточка с таким id не найден');
+      }
+      if (movie.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Чужие карточки удалять нельзя');
+      }
+      return movie.remove()
+        .then(() => res.send({ message: 'Карточка удалена' }));
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new ErrorCode('Некорректный id карточки'));
+      } else {
+        next(err);
+      }
+    });
+};
