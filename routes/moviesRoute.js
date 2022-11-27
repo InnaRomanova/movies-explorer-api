@@ -5,7 +5,7 @@ const { validateMovieId, validateMovieData } = require('../utils/validators/movi
 // возвращает все сохраненные текущим пользователем фильмы
 movieRouter.get('/', movieController.getMovies);
 
-// создает фильм с переданными в теле полями
+// создает фильм с переданными в теле полями(свойствами)
 movieRouter.post('/', validateMovieData, movieController.createMovie);
 
 // удалаяет сохранный фильм по id
