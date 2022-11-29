@@ -1,7 +1,7 @@
 // Массив доменов, с которых разрешены кросс-доменные запросы
 const allowedCors = [
-  'https://inna.domainname.student.nomoredomains.icu',
-  'http://inna.domainname.student.nomoredomains.icu',
+  'https://romanova.nomoredomains.club',
+  'http://romanova.nomoredomains.club',
   'https://localhost:3000',
   'http://localhost:3000',
 ];
