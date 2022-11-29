@@ -5,12 +5,38 @@ const ServerCode = require('../errors/serverCode');
 const ForbiddenError = require('../errors/forbiddenError');
 
 module.exports.getMovie = (req, res, next) => {
-  Movie.find({ owner: req.user._id }).then((movies) => res.send(movies))
+  Movie.find({ owner: req.user._id }).populate('user').then((movies) => res.send(movies))
     .catch(next);
 };
 
 module.exports.createMovie = (req, res, next) => {
-  Movie.findOne({ movieId: req.body.movieId, owner: req.user._id })
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    nameRU,
+    nameEN,
+    movieId,
+  } = req.body;
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    thumbnail,
+    nameRU,
+    nameEN,
+    movieId,
+    owner: req.user._id,
+  })
     .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -23,19 +49,22 @@ module.exports.createMovie = (req, res, next) => {
 
 module.exports.removeMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
+    // .orFail(() => {
+    //   throw new NotFoundCode('Фильм с таким id не найден');
+    // })
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundCode('Карточка с таким id не найден');
+        throw new NotFoundCode('Фильм с таким id не найден');
       }
       if (movie.owner.toString() !== req.user._id) {
-        throw new ForbiddenError('Чужие карточки удалять нельзя');
+        throw new ForbiddenError('Чужие фильмы удалять нельзя');
       }
-      return movie.remove()
-        .then(() => res.send({ message: 'Карточка удалена' }));
+      return movie.delete()
+        .then(() => res.send({ message: 'Фильм удален' }));
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ErrorCode('Некорректный id карточки'));
+        next(new ErrorCode('Некорректный id фильма'));
       } else {
         next(err);
       }

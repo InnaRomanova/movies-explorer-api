@@ -18,8 +18,8 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
           sameSite: true,
-          secure: true,
-          domain: 'api.romanova.nomoredomains.club',
+          // secure: true,
+          domain: 'localhost',
         }).send({ email });
     })
     .catch((err) => {
@@ -107,13 +107,6 @@ module.exports.updateUserInfo = (req, res, next) => {
   };
   updateUser(req, res, next, userData);
 };
-
-// module.exports.updateUserAvatar = (req, res, next) => {
-// const userData = {
-// avatar: req.body.avatar,
-// };
-// updateUser(req, res, next, userData);
-// };
 
 module.exports.getProfile = (req, res, next) => {
   User.findOne({ _id: req.user._id })

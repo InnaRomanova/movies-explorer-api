@@ -21,7 +21,7 @@ const movieSchema = new mongoose.Schema({
   },
   year: {
     require: true,
-    type: Number,
+    type: String,
   },
   description: {
     require: true,
@@ -50,6 +50,7 @@ const movieSchema = new mongoose.Schema({
   movieId: {
     require: true,
     type: Number,
+    unique: true,
   },
   nameRU: {
     require: true,
@@ -59,6 +60,11 @@ const movieSchema = new mongoose.Schema({
     require: true,
     type: String,
   },
+  save: [{
+    type: mongoose.Types.ObjectId,
+    ref: 'user',
+    default: [],
+  }],
 });
 
 module.exports = mongoose.model('movie', movieSchema);
