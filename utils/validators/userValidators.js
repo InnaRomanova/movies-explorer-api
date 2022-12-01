@@ -24,6 +24,7 @@ module.exports.validateUserId = celebrate({
 
 module.exports.validateUserInfo = celebrate({
   body: Joi.object().keys({
+    email: Joi.string().required().email(),
     name: Joi.string().min(2).max(30).required(),
   }),
 });

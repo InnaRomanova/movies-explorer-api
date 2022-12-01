@@ -6,6 +6,7 @@ const NotFoundCode = require('../errors/notFoundCode');
 const ConflictEmail = require('../errors/conflictEmail');
 const { getJWTSecretKey } = require('../utils/utils');
 
+// авторизация пользователя
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUser(email, password)
@@ -31,6 +32,7 @@ module.exports.login = (req, res, next) => {
     });
 };
 
+// выход пользователя
 module.exports.logout = (req, res) => {
   res.clearCookie('token').send({ message: 'Вы вышли из профиля' });
 };
@@ -41,7 +43,7 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res, next) => {
-  User.findOne({ _id: req.params.id })
+  User.findById({ _id: req.user._id })
     .then((user) => {
       if (!user) {
         throw new NotFoundCode('Пользователь с таким id не найден');
@@ -57,6 +59,7 @@ module.exports.getUser = (req, res, next) => {
     });
 };
 
+// регистрация пользователя
 module.exports.createUser = async (req, res, next) => {
   const {
     name,
@@ -82,30 +85,28 @@ module.exports.createUser = async (req, res, next) => {
   }
 };
 
-const updateUser = (req, res, next, userData) => {
-  User.findByIdAndUpdate(req.user._id, userData, {
-    new: true,
-    runValidators: true,
-  })
-    .then((user) => {
-      res.send(user);
+module.exports.updateUserInfo = (req, res, next) => {
+  const { name, email } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, email },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .catch(() => {
+      throw new ConflictEmail('Пользователь с таким email уже существует');
     })
+    .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ErrorCode('Отправленные данные некорректный, перепроверьте данные.'));
-      } else if (err.name === 'CastError') {
-        next(new ErrorCode('Не корректный _id пользователя'));
       } else {
         next(err);
       }
     });
-};
-
-module.exports.updateUserInfo = (req, res, next) => {
-  const userData = {
-    name: req.body.name,
-  };
-  updateUser(req, res, next, userData);
 };
 
 module.exports.getProfile = (req, res, next) => {

@@ -5,7 +5,7 @@ const ServerCode = require('../errors/serverCode');
 const ForbiddenError = require('../errors/forbiddenError');
 
 module.exports.getMovie = (req, res, next) => {
-  Movie.find({ owner: req.user._id }).populate('user').then((movies) => res.send(movies))
+  Movie.find({ owner: req.user._id }).then((movies) => res.send(movies))
     .catch(next);
 };
 
@@ -48,7 +48,7 @@ module.exports.createMovie = (req, res, next) => {
 };
 
 module.exports.removeMovie = (req, res, next) => {
-  Movie.findById(req.params.movieId)
+  Movie.findById(req.params.id)
     // .orFail(() => {
     //   throw new NotFoundCode('Фильм с таким id не найден');
     // })

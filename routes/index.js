@@ -13,7 +13,9 @@ router.get('/crash-test', () => {
   }, 0);
 });
 
+// авторизация
 router.post('/signin', validateLoginData, userController.login);
+// регистрация
 router.post('/signup', validateRegisterData, userController.createUser);
 
 router.use(auth);
