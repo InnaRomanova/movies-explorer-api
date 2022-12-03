@@ -15,10 +15,10 @@ const { PORT = 3000, NODE_ENV, ADDRESS_DB } = process.env; // Слушаем 300
 
 const app = express();
 mongoose.connect(NODE_ENV === 'production' ? ADDRESS_DB : 'mongodb://127.0.0.1/moviesdb');
+app.use(requestLogger); // подключаем логгер запросов
 app.use(limiter);
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(requestLogger); // подключаем логгер запросов
 app.use(helmet());
 app.use(cors);
 app.use(routers);
