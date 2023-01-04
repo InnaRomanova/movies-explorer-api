@@ -3,11 +3,12 @@ const { getJWTSecretKey } = require('../utils/utils');
 const UnauthorixedErrorCode = require('../errors/unauthorixedErrorCode');
 
 module.exports = (req, _, next) => {
-  const { token } = req.cookies;
-  if (!token) {
+  const { authorization } = req.headers;
+  if (!authorization || !authorization.startsWith('Bearer')) {
     throw new UnauthorixedErrorCode('Необходима авторизация');
   }
 
+  const token = authorization.replace('Bearer ', '');
   let payload;
   // верифицирую токен
   try {

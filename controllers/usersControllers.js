@@ -13,15 +13,15 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       // создаю токен
       const token = jwt.sign({ _id: user._id }, getJWTSecretKey(), { expiresIn: '7d' });
-      res
-        .cookie('token', token, {
-          // JWT токен, который отправляем
-          maxAge: 3600000,
-          httpOnly: true,
-          sameSite: true,
-          secure: true,
-          domain: 'api.romanova.nomoredomains.club',
-        }).send({ email });
+      res.send({ email, token });
+      //  .cookie('token', token, {
+      //    // JWT токен, который отправляем
+      //    maxAge: 3600000,
+      //    httpOnly: true,
+      //    sameSite: true,
+      //    secure: true,
+      //    domain: 'api.romanova.nomoredomains.club',
+      //  }).send({ email });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
