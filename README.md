@@ -42,5 +42,5 @@
 - [Критерии диплома веб-разработчика](https://code.s3.yandex.net/web-developer/static/new-program/web-diploma-criteria-2.0/index.html)
 
 ## Ссылки:
-Публичный IP-адрес сервера - 84.201.132.246    
-Домен сервера - https://api.romanova.nomoredomains.club
+Публичный IP-адрес сервера - ...    
+Домен сервера - https://....
